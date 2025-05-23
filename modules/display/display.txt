@@ -1,0 +1,64 @@
+Descripción de display.cpp y display.h
+======================================
+
+1. Tipos de datos definidos
+---------------------------
+En 'display.h':
+- displayConnection_t: Enumeración que define el tipo de conexión del display:
+  - DISPLAY_CONNECTION_GPIO_4BITS
+  - DISPLAY_CONNECTION_GPIO_8BITS
+
+- display_t: Estructura con un único campo:
+  - connection: de tipo displayConnection_t, indica el tipo de conexión.
+
+2. Variables globales
+---------------------
+En 'display.cpp':
+- DigitalOut displayD4, displayD5, displayD6, displayD7, displayRs, displayEn:
+  Controlan los pines de datos y control del display.
+
+- static display_t display:
+  Variable global que almacena la configuración del display.
+
+- static bool initial8BitCommunicationIsCompleted:
+  Bandera que indica si se completó la inicialización en modo 8 bits (necesario para modo 4 bits).
+
+3. Funciones públicas
+---------------------
+Declaradas en 'display.h' y definidas en 'display.cpp':
+- void displayInit(displayConnection_t connection):
+  Inicializa el display según el tipo de conexión.
+
+- void displayCharPositionWrite(uint8_t charPositionX, uint8_t charPositionY):
+  Posiciona el cursor en la coordenada X, Y del display 20x4.
+
+- void displayStringWrite(const char* str):
+  Escribe una cadena de caracteres en el display desde la posición actual.
+
+4. Funciones privadas
+---------------------
+Solo en 'display.cpp':
+- static void displayCodeWrite(bool type, uint8_t dataBus):
+  Envía un comando o dato al display, dependiendo del parámetro 'type'.
+
+- static void displayDataBusWrite(uint8_t dataByte):
+  Escribe un byte en el bus de datos del display, manejando el modo 4 o 8 bits.
+
+- static void displayPinWrite(uint8_t pinName, int value):
+  Asigna el valor a un pin específico según la conexión (4 u 8 bits).
+
+5. Constantes definidas (#define)
+---------------------------------
+- Instrucciones del controlador del display (por ejemplo, DISPLAY_IR_CLEAR_DISPLAY, DISPLAY_IR_FUNCTION_SET, etc).
+- Modos de configuración: bits de control para funciones, entradas, encendido/apagado del cursor, etc.
+- Mapeo de pines: DISPLAY_PIN_RS, DISPLAY_PIN_D4, etc.
+- Direcciones de memoria DDRAM para las líneas del display 20x4:
+  - DISPLAY_20x4_LINE1_FIRST_CHARACTER_ADDRESS
+  - DISPLAY_20x4_LINE2_FIRST_CHARACTER_ADDRESS
+  - DISPLAY_20x4_LINE3_FIRST_CHARACTER_ADDRESS
+  - DISPLAY_20x4_LINE4_FIRST_CHARACTER_ADDRESS
+
+6. Estructura del control
+-------------------------
+- Uso de estructuras switch para manejar el tipo de conexión y seleccionar líneas del display.
+- Lógica jerárquica: displayInit() llama a displayCodeWrite(), que llama a displayDataBusWrite(), que a su vez utiliza displayPinWrite().
